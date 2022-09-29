@@ -1,0 +1,30 @@
+current_places = func cmd='get_latest_entity_values';
+current_places_len = func cmd='array_len', values=current_places;
+
+city_db = {};
+city_db['brussels'] = 'Europe/Brussels';
+city_db['zagreb'] = 'Europe/Zagreb';
+city_db['london'] = 'Europe/Dublin';
+city_db['lisbon'] = 'Europe/Lisbon';
+city_db['amsterdam'] = 'Europe/Amsterdam';
+city_db['seattle'] = 'US/Pacific';
+
+nw = func cmd='now';
+if current_places_len == 0 {
+  time_str = func cmd='format_date', format='YYYY-MM-DD',  value=nw;
+  msg = func cmd='template',  value="It's {time_str} now. You can also give me a place.";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+current_place = current_places[0];
+tz_string = city_db[current_place];
+if !tz_string {
+  msg = func cmd='template',  value="It's I didn't recognize {current_place}. Is it spelled correctly?";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+time_str = func cmd='format_date', format='YYYY-MM-DD',  timezone=tz_string, value=nw;
+msg = func cmd='template',  value="It's {time_str} in {current_place} now.";
+func cmd='utter_essage',  text=msg;

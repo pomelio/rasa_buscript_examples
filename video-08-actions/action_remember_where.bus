@@ -1,0 +1,31 @@
+current_places = func cmd='get_latest_entity_values';
+current_places_len = func cmd='array_len', values=current_places;
+
+city_db = {};
+city_db['brussels'] = 'Europe/Brussels';
+city_db['zagreb'] = 'Europe/Zagreb';
+city_db['london'] = 'Europe/Dublin';
+city_db['lisbon'] = 'Europe/Lisbon';
+city_db['amsterdam'] = 'Europe/Amsterdam';
+city_db['seattle'] = 'US/Pacific';
+
+nw = func cmd='now';
+if current_places_len == 0 {
+  msg = func cmd='template',  value="I didn't get where you lived. Are you sure it's spelled correctly?";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+current_place = current_places[0];
+tz_string = city_db[current_place];
+if !tz_string {
+  msg = func cmd='template',  value="I didn't recognize {current_place}. Is it spelled correctly?";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+msg = func cmd='template',  value="Sure thing! I'll remember that you live in {current_place}..";
+func cmd='utter_message',  text=msg;
+
+func cmd='set_slot', key='location', value=current_place;
+

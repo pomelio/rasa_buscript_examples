@@ -1,0 +1,46 @@
+timezone_to = func cmd='get_latest_entity_values';
+timezone_in = func cmd='get_slot', key='location';
+
+
+if !timezone_in {
+  msg = func cmd='template',  value="To calculuate the time difference I need to know where you live.";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+
+nw = func cmd='now';
+
+if current_places_len == 0 {
+  msg = func cmd='template',  value="I didn't the timezone you'd like to compare against. Are you sure it's spelled correctly?";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+current_places_len = func cmd='array_len', values= timezone_to;
+
+
+city_db = {};
+city_db['brussels'] = 'Europe/Brussels';
+city_db['zagreb'] = 'Europe/Zagreb';
+city_db['london'] = 'Europe/Dublin';
+city_db['lisbon'] = 'Europe/Lisbon';
+city_db['amsterdam'] = 'Europe/Amsterdam';
+city_db['seattle'] = 'US/Pacific';
+
+timezone_to = timezone_to[0];
+tz_string = city_db[current_place];
+if !tz_string {
+  msg = func cmd='template',  value="I didn't recognize {current_place}. Is it spelled correctly?";
+  func cmd='utter_message',  text=msg;
+  stop {};
+}
+
+t1 = func cmd='now', timezone=timezone_to;
+t2 = func cmd='now', timezone=timezone_in;
+max_t = func cmd='math_max', values=[t1, t2];
+min_t = func cmd='math_min', values=[t1, t2];
+diff_hours = (max_t - min_t) / 3600000;
+
+msg = func cmd='template',  value="There is a {diff_hours} hours time difference.";
+func cmd='utter_message',  text=msg;
